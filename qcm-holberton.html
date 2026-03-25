@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AZ·QCM — Adam Zouaoui</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#fff8f6;--bg2:#fff1ee;--red:#e8192c;--red2:#ff4d1a;--red3:#c0001a;--blush:#ff8577;--text:#1a0608;--muted:rgba(26,6,8,0.45);--glass:rgba(255,255,255,0.65);--gborder:rgba(232,25,44,0.15);--ghover:rgba(255,255,255,0.85);--shadow:rgba(232,25,44,0.12);}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -85,7 +85,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .question-card{background:rgba(255,255,255,0.82);border:1px solid rgba(232,25,44,0.12);border-radius:22px;padding:38px 38px 30px;backdrop-filter:blur(24px);margin-bottom:18px;position:relative;overflow:hidden;box-shadow:0 4px 32px rgba(232,25,44,0.07);}
 .question-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),var(--red2),transparent);}
 .question-text{font-size:clamp(17px,2.4vw,22px);font-weight:500;line-height:1.55;letter-spacing:-0.01em;color:var(--text);}
-.code-block{font-family:'Orbitron',monospace;font-size:12px;line-height:1.8;background:rgba(12,4,6,0.94);color:#f0e8e9;border-radius:12px;padding:20px 24px;margin:18px 0 6px;overflow-x:auto;white-space:pre;border:1px solid rgba(232,25,44,0.25);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04),0 4px 20px rgba(0,0,0,0.18);position:relative;}
+.code-block{font-family:'Share Tech Mono','Courier New',monospace;font-size:13.5px;line-height:1.75;background:rgba(12,4,6,0.94);color:#f0e8e9;border-radius:12px;padding:20px 24px;margin:18px 0 6px;overflow-x:auto;white-space:pre;border:1px solid rgba(232,25,44,0.25);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04),0 4px 20px rgba(0,0,0,0.18);position:relative;}
 .code-block::before{content:'C';position:absolute;top:10px;right:14px;font-size:10px;letter-spacing:0.2em;color:rgba(232,25,44,0.45);font-weight:700;}
 .ck{color:#ff9eb5;} .cf{color:#ffb347;} .cn{color:#98e884;} .cs{color:#87d7ff;} .cc{color:#666;font-style:italic;}
 .code-label{display:inline-flex;align-items:center;gap:6px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-top:14px;margin-bottom:2px;opacity:0.75;}
@@ -196,7 +196,7 @@ body.dark .btn-retry:disabled{background:rgba(255,255,255,0.05);color:rgba(245,2
   .progress-track{margin-bottom:32px;}
   .question-card{padding:22px 18px 18px;border-radius:16px;}
   .question-text{font-size:16px;}
-  .code-block{font-size:10px;padding:14px 14px;letter-spacing:0;}
+  .code-block{font-size:12px;padding:14px 14px;letter-spacing:0;}
   .opt-btn{padding:14px 14px;gap:12px;}
   .opt-key{width:36px;height:36px;font-size:10px;}
   .opt-btn:hover:not(:disabled){transform:translateX(3px);}
