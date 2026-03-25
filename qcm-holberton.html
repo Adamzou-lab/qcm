@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none';">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="no-referrer">
 <title>AZ·QCM — Adam Zouaoui</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -237,7 +241,7 @@ body.dark .toggle-btn::after{transform:translateX(22px);box-shadow:0 2px 10px rg
     <div style="display:flex;align-items:center;gap:14px;">
       <div class="theme-toggle">
         <span class="toggle-icon" id="toggle-icon">☀️</span>
-        <button class="toggle-btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Changer de thème"></button>
+        <button class="toggle-btn" id="theme-toggle" aria-label="Changer de thème"></button>
       </div>
       <div class="score-hud" id="score-hud">——</div>
     </div>
@@ -258,7 +262,7 @@ body.dark .toggle-btn::after{transform:translateX(22px);box-shadow:0 2px 10px rg
             <div class="langue-name">Langage C</div>
             <div class="langue-meta" id="c-meta">Sélectionne des thèmes ci-dessous</div>
           </div>
-          <button class="btn-select-all" id="btn-all" onclick="selectAll()">Tout sélectionner</button>
+          <button class="btn-select-all" id="btn-all">Tout sélectionner</button>
         </div>
         <div class="subcat-grid" id="subcat-grid"></div>
       </div>
@@ -275,7 +279,7 @@ body.dark .toggle-btn::after{transform:translateX(22px);box-shadow:0 2px 10px rg
       </div>
       <div class="start-wrap">
         <div class="start-hint" id="start-hint">Sélectionne au moins un thème pour commencer</div>
-        <button class="btn-start" id="btn-start" disabled onclick="startQuiz()">Lancer le QCM <span class="btn-arrow">→</span></button>
+        <button class="btn-start" id="btn-start" disabled>Lancer le QCM <span class="btn-arrow">→</span></button>
       </div>
     </div>
 
@@ -289,7 +293,7 @@ body.dark .toggle-btn::after{transform:translateX(22px);box-shadow:0 2px 10px rg
       <div class="question-card"><div class="question-text" id="qtext">—</div></div>
       <div class="options-list" id="opts"></div>
       <div class="expl-box" id="expl" style="display:none"></div>
-      <button class="btn-next" id="btn-next" style="display:none" onclick="nextQ()">Continuer <span>→</span></button>
+      <button class="btn-next" id="btn-next" style="display:none">Continuer <span>→</span></button>
     </div>
 
     <!-- RESULTS -->
@@ -318,8 +322,8 @@ body.dark .toggle-btn::after{transform:translateX(22px);box-shadow:0 2px 10px rg
       <p class="result-sub" id="rsub">—</p>
       <div class="recap" id="recap"></div>
       <div class="result-actions">
-        <button class="btn-retry" id="btn-retry" onclick="retryErrors()">↺ Refaire mes erreurs</button>
-        <button class="btn-restart" onclick="goHome()">← Recommencer</button>
+        <button class="btn-retry" id="btn-retry">↺ Refaire mes erreurs</button>
+        <button class="btn-restart" id="btn-restart">← Recommencer</button>
       </div>
     </div>
 
@@ -329,6 +333,23 @@ body.dark .toggle-btn::after{transform:translateX(22px);box-shadow:0 2px 10px rg
 /* ══════════════════════════════════════════
    SYNTAX HIGHLIGHTER — plain text → HTML
 ══════════════════════════════════════════ */
+/* ── SÉCURITÉ ─────────────────────────────────────────────
+   sanitize() : autorise uniquement <strong>, <code>, <em>
+   Utilisé sur q.expl qui contient du HTML intentionnel.
+─────────────────────────────────────────────────────────── */
+function sanitize(html) {
+  return html.replace(/<[^>]*>/g, tag => /^<\/?(strong|code|em)>$/.test(tag) ? tag : '');
+}
+
+/* ── SHUFFLE Fisher-Yates (remplace .sort(() => Math.random()-0.5)) */
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function highlight(raw) {
   const esc = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   return esc
@@ -568,7 +589,7 @@ function updateUI(){
 function startQuiz(){
   pool=[];
   sel.forEach(cat=>SUBCATS[cat].questions.forEach(q=>pool.push({...q,cat})));
-  pool.sort(()=>Math.random()-0.5);
+  shuffle(pool);
   cur=0; score=0; recap=[]; answered=false;
   show('quiz'); renderQ();
 }
@@ -592,8 +613,10 @@ function renderQ(){
   const list=document.getElementById('opts'); list.innerHTML='';
   ['A','B','C','D'].slice(0,q.opts.length).forEach((k,i)=>{
     const b=document.createElement('button'); b.className='opt-btn';
-    b.innerHTML=`<span class="opt-key">${k}</span><span class="opt-text">${q.opts[i]}</span>`;
-    b.onclick=()=>pick(i); list.appendChild(b);
+    const ks=document.createElement('span'); ks.className='opt-key'; ks.textContent=k;
+    const ts=document.createElement('span'); ts.className='opt-text'; ts.textContent=q.opts[i];
+    b.appendChild(ks); b.appendChild(ts);
+    b.addEventListener('click',()=>pick(i)); list.appendChild(b);
   });
 }
 
@@ -607,7 +630,7 @@ function pick(idx){
   });
   if(idx===q.answer) score++;
   recap.push({q:q.q, cat:q.cat, ok:idx===q.answer, ans:q.opts[q.answer]});
-  const expl=document.getElementById('expl'); expl.innerHTML=q.expl; expl.style.display='block';
+  const expl=document.getElementById('expl'); expl.innerHTML=sanitize(q.expl); expl.style.display='block';
   const bn=document.getElementById('btn-next'); bn.style.display='inline-flex';
   bn.innerHTML=cur<pool.length-1?'Continuer <span>→</span>':'Voir les résultats <span>→</span>';
   const hud=document.getElementById('score-hud');
@@ -642,11 +665,13 @@ function showResults(){
   const rc=document.getElementById('recap'); rc.innerHTML='';
   recap.forEach(r=>{
     const d=document.createElement('div'); d.className='recap-item';
-    d.innerHTML=`<div class="recap-dot ${r.ok?'ok':'ko'}"></div><div>
-      <div class="recap-cat">${r.cat}</div>
-      <div class="recap-q">${r.q}</div>
-      ${!r.ok?`<div class="recap-a">→ ${r.ans}</div>`:''}</div>`;
-    rc.appendChild(d);
+    const dot=document.createElement('div'); dot.className=`recap-dot ${r.ok?'ok':'ko'}`;
+    const info=document.createElement('div');
+    const cat=document.createElement('div'); cat.className='recap-cat'; cat.textContent=r.cat;
+    const qd=document.createElement('div'); qd.className='recap-q'; qd.textContent=r.q;
+    info.appendChild(cat); info.appendChild(qd);
+    if(!r.ok){const ad=document.createElement('div'); ad.className='recap-a'; ad.textContent=`→ ${r.ans}`; info.appendChild(ad);}
+    d.appendChild(dot); d.appendChild(info); rc.appendChild(d);
   });
   show('results');
   document.getElementById('pfill').style.width='100%';
@@ -691,6 +716,12 @@ function toggleTheme(){
     document.body.classList.add('dark');
     document.getElementById('toggle-icon').textContent='🌙';
   }
+  document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+  document.getElementById('btn-all').addEventListener('click', selectAll);
+  document.getElementById('btn-start').addEventListener('click', startQuiz);
+  document.getElementById('btn-next').addEventListener('click', nextQ);
+  document.getElementById('btn-retry').addEventListener('click', retryErrors);
+  document.getElementById('btn-restart').addEventListener('click', goHome);
 })();
 
 init();
