@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AZ·QCM — Adam Zouaoui</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff8f6;--bg2:#fff1ee;--red:#e8192c;--red2:#ff4d1a;--red3:#c0001a;--blush:#ff8577;--text:#1a0608;--muted:rgba(26,6,8,0.45);--glass:rgba(255,255,255,0.65);--gborder:rgba(232,25,44,0.15);--ghover:rgba(255,255,255,0.85);--shadow:rgba(232,25,44,0.12);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.aurora-blob{position:absolute;border-radius:50%;filter:blur(110px);animation:drift 14s ease-in-out infinite alternate;}
+.aurora-blob:nth-child(1){width:720px;height:520px;top:-160px;left:-200px;background:radial-gradient(circle,#ffcdd2,#ff8577);opacity:0.55;animation-delay:0s;}
+.aurora-blob:nth-child(2){width:640px;height:640px;bottom:-220px;right:-180px;background:radial-gradient(circle,#ff4d1a,#e8192c);opacity:0.18;animation-delay:-5s;}
+.aurora-blob:nth-child(3){width:500px;height:420px;top:35%;left:38%;background:radial-gradient(circle,#ffd6cc,#ffb3a7);opacity:0.4;animation-delay:-9s;}
+@keyframes drift{from{transform:translate(0,0) scale(1);}to{transform:translate(40px,30px) scale(1.1);}}
+.app{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+.header{width:100%;max-width:960px;padding:30px 36px 0;display:flex;justify-content:space-between;align-items:center;}
+.logo{font-family:'Orbitron',monospace;font-size:14px;font-weight:900;letter-spacing:0.25em;display:flex;align-items:center;gap:6px;}
+.logo-az{background:linear-gradient(135deg,var(--red),var(--red2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 2px 8px rgba(232,25,44,0.35));}
+.logo-sep{color:var(--blush);opacity:0.7;}
+.logo-qcm{color:var(--text);}
+.score-hud{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:0.12em;color:var(--muted);padding:8px 20px;border:1px solid var(--gborder);border-radius:100px;background:var(--glass);backdrop-filter:blur(14px);transition:all 0.4s;box-shadow:0 2px 12px var(--shadow);}
+.score-hud.active{color:var(--red);border-color:rgba(232,25,44,0.4);box-shadow:0 0 20px rgba(232,25,44,0.15);}
+.main{width:100%;max-width:960px;padding:0 36px 100px;flex:1;}
+.screen{animation:screenIn 0.55s cubic-bezier(0.22,1,0.36,1);}
+@keyframes screenIn{from{opacity:0;transform:translateY(28px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+#screen-home{padding-top:72px;}
+.hero{margin-bottom:64px;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:0.35em;text-transform:uppercase;margin-bottom:22px;padding:6px 16px;border-radius:100px;background:linear-gradient(135deg,rgba(232,25,44,0.08),rgba(255,77,26,0.06));border:1px solid rgba(232,25,44,0.25);color:var(--red);opacity:0;animation:fadeUp 0.6s 0.1s forwards;box-shadow:0 2px 12px rgba(232,25,44,0.08);}
+.hero-eyebrow::before{content:'◆';font-size:8px;color:var(--red2);}
+.hero-title{font-family:'Orbitron',monospace;font-size:clamp(42px,7.5vw,88px);font-weight:900;line-height:0.92;letter-spacing:-0.025em;margin-bottom:28px;opacity:0;animation:fadeUp 0.6s 0.2s forwards;}
+.hero-title .t1{display:block;color:var(--text);}
+.hero-title .t2{display:block;background:linear-gradient(110deg,var(--red3),var(--red),var(--red2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 4px 20px rgba(232,25,44,0.25));}
+.hero-desc{font-size:16px;color:var(--muted);line-height:1.75;max-width:480px;opacity:0;animation:fadeUp 0.6s 0.3s forwards;}
+.langue-block{opacity:0;animation:fadeUp 0.6s 0.4s forwards;}
+.langue-header{display:flex;align-items:center;gap:18px;margin-bottom:22px;padding:20px 24px;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,0.9),rgba(255,245,243,0.8));border:1px solid rgba(232,25,44,0.18);box-shadow:0 4px 24px rgba(232,25,44,0.08);backdrop-filter:blur(16px);}
+.langue-icon-wrap{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(232,25,44,0.12),rgba(255,77,26,0.08));border:1px solid rgba(232,25,44,0.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.langue-info{flex:1;}
+.langue-name{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;letter-spacing:0.08em;color:var(--text);margin-bottom:4px;}
+.langue-meta{font-size:13px;color:var(--muted);}
+.langue-meta strong{color:var(--red);}
+.btn-select-all{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:9px 16px;border:1px solid rgba(232,25,44,0.3);border-radius:8px;background:rgba(232,25,44,0.06);color:var(--red);cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-select-all:hover{background:rgba(232,25,44,0.12);box-shadow:0 4px 16px rgba(232,25,44,0.15);}
+.subcat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px;}
+.subcat-card{background:rgba(255,255,255,0.75);border:1px solid rgba(232,25,44,0.1);border-radius:16px;padding:20px 18px;cursor:pointer;backdrop-filter:blur(18px);transition:all 0.28s cubic-bezier(0.25,0.46,0.45,0.94);position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(232,25,44,0.06);}
+.subcat-card::before{content:'';position:absolute;top:-40%;left:-40%;width:180%;height:180%;background:radial-gradient(circle at 40% 40%,var(--cc,var(--red)),transparent 65%);opacity:0;transition:opacity 0.35s;}
+.subcat-card:hover{border-color:var(--cc,var(--red));transform:translateY(-5px) scale(1.03);box-shadow:0 12px 36px -8px var(--cc,var(--red));background:rgba(255,255,255,0.92);}
+.subcat-card:hover::before{opacity:0.07;}
+.subcat-card.selected{border-color:var(--cc,var(--red));background:rgba(255,255,255,0.95);box-shadow:0 0 0 1.5px var(--cc,var(--red)) inset,0 6px 30px -6px var(--cc,var(--red));}
+.subcat-card.selected::before{opacity:0.1;}
+.subcat-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.subcat-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(232,25,44,0.08),rgba(255,77,26,0.05));border:1px solid rgba(232,25,44,0.12);display:flex;align-items:center;justify-content:center;font-size:17px;}
+.subcat-tick{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(232,25,44,0.2);display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all 0.22s;flex-shrink:0;}
+.subcat-card.selected .subcat-tick{background:var(--cc,var(--red));border-color:var(--cc,var(--red));color:#fff;box-shadow:0 0 10px var(--cc,var(--red));}
+.subcat-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:0.04em;line-height:1.35;margin-bottom:6px;color:var(--text);}
+.subcat-count{font-size:11px;color:var(--muted);}
+.divider{height:1px;margin:44px 0;background:linear-gradient(90deg,transparent,rgba(232,25,44,0.2),rgba(255,77,26,0.2),transparent);opacity:0;animation:fadeUp 0.5s 0.5s forwards;}
+.langue-locked-wrap{opacity:0;animation:fadeUp 0.6s 0.55s forwards;}
+.langue-locked-card{display:flex;align-items:center;gap:20px;padding:22px 26px;border-radius:16px;background:rgba(255,255,255,0.4);border:1px solid rgba(26,6,8,0.08);position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.04);}
+.langue-locked-card::after{content:'';position:absolute;inset:0;background:rgba(255,248,246,0.6);backdrop-filter:blur(4px);border-radius:16px;}
+.locked-icon{font-size:26px;position:relative;z-index:1;opacity:0.3;}
+.locked-text{flex:1;position:relative;z-index:1;}
+.locked-name{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;letter-spacing:0.08em;color:rgba(26,6,8,0.25);display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.locked-badge{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:0.15em;padding:3px 10px;border-radius:5px;background:rgba(232,25,44,0.08);border:1px solid rgba(232,25,44,0.2);color:rgba(232,25,44,0.5);}
+.locked-desc{font-size:13px;color:rgba(26,6,8,0.2);}
+.locked-padlock{position:relative;z-index:1;font-size:20px;opacity:0.2;}
+.start-wrap{margin-top:48px;opacity:0;animation:fadeUp 0.6s 0.62s forwards;}
+.start-hint{font-size:13px;color:var(--muted);margin-bottom:18px;font-family:'Orbitron',monospace;letter-spacing:0.06em;}
+.start-hint strong{color:var(--red);}
+.btn-start{position:relative;display:inline-flex;align-items:center;gap:14px;padding:18px 44px;border:none;border-radius:14px;cursor:pointer;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;overflow:hidden;transition:all 0.3s;background:linear-gradient(135deg,var(--red3),var(--red),var(--red2));color:#fff;}
+.btn-start::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.25),transparent 60%);opacity:0;transition:opacity 0.3s;}
+.btn-start:hover:not(:disabled){transform:translateY(-4px);box-shadow:0 12px 40px rgba(232,25,44,0.4),0 4px 16px rgba(255,77,26,0.3);}
+.btn-start:hover:not(:disabled)::before{opacity:1;}
+.btn-start:disabled{background:rgba(26,6,8,0.06);color:rgba(26,6,8,0.25);border:1px solid rgba(26,6,8,0.1);cursor:not-allowed;box-shadow:none;transform:none;}
+.btn-arrow{font-size:19px;transition:transform 0.2s;}
+.btn-start:hover:not(:disabled) .btn-arrow{transform:translateX(6px);}
+#screen-quiz{padding-top:52px;}
+.progress-track{height:3px;background:rgba(232,25,44,0.1);border-radius:3px;margin-bottom:52px;position:relative;}
+.progress-glow{position:absolute;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--red3),var(--red),var(--red2),var(--blush));transition:width 0.5s cubic-bezier(0.25,0.46,0.45,0.94);box-shadow:0 0 10px rgba(232,25,44,0.5);}
+.q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;}
+.q-badge{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:0.18em;padding:7px 16px;border-radius:8px;background:rgba(232,25,44,0.07);border:1px solid rgba(232,25,44,0.25);color:var(--red);}
+.q-num{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:0.1em;color:var(--muted);}
+.question-card{background:rgba(255,255,255,0.82);border:1px solid rgba(232,25,44,0.12);border-radius:22px;padding:38px 38px 30px;backdrop-filter:blur(24px);margin-bottom:18px;position:relative;overflow:hidden;box-shadow:0 4px 32px rgba(232,25,44,0.07);}
+.question-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),var(--red2),transparent);}
+.question-text{font-size:clamp(17px,2.4vw,22px);font-weight:500;line-height:1.55;letter-spacing:-0.01em;color:var(--text);}
+.code-block{font-family:'Orbitron',monospace;font-size:12px;line-height:1.8;background:rgba(12,4,6,0.94);color:#f0e8e9;border-radius:12px;padding:20px 24px;margin:18px 0 6px;overflow-x:auto;white-space:pre;border:1px solid rgba(232,25,44,0.25);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04),0 4px 20px rgba(0,0,0,0.18);position:relative;}
+.code-block::before{content:'C';position:absolute;top:10px;right:14px;font-size:10px;letter-spacing:0.2em;color:rgba(232,25,44,0.45);font-weight:700;}
+.ck{color:#ff9eb5;} .cf{color:#ffb347;} .cn{color:#98e884;} .cs{color:#87d7ff;} .cc{color:#666;font-style:italic;}
+.code-label{display:inline-flex;align-items:center;gap:6px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-top:14px;margin-bottom:2px;opacity:0.75;}
+.options-list{display:flex;flex-direction:column;gap:11px;margin-bottom:22px;}
+.opt-btn{display:grid;grid-template-columns:42px 1fr;align-items:center;gap:16px;padding:17px 22px;background:rgba(255,255,255,0.7);border:1px solid rgba(232,25,44,0.1);border-radius:14px;cursor:pointer;text-align:left;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;backdrop-filter:blur(12px);transition:all 0.22s cubic-bezier(0.25,0.46,0.45,0.94);position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(232,25,44,0.04);}
+.opt-btn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--red),var(--red2));opacity:0;transition:opacity 0.2s;border-radius:3px 0 0 3px;}
+.opt-btn:hover:not(:disabled){border-color:rgba(232,25,44,0.3);background:rgba(255,255,255,0.95);transform:translateX(7px);box-shadow:0 4px 20px rgba(232,25,44,0.1);}
+.opt-btn:hover:not(:disabled)::before{opacity:1;}
+.opt-key{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;width:42px;height:42px;border-radius:10px;background:rgba(232,25,44,0.06);border:1px solid rgba(232,25,44,0.15);color:var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.22s;letter-spacing:0.05em;}
+.opt-text{line-height:1.45;}
+.opt-btn.correct{border-color:#16a34a;background:rgba(22,163,74,0.06);box-shadow:0 0 24px -6px rgba(22,163,74,0.3);}
+.opt-btn.correct::before{opacity:1;background:linear-gradient(180deg,#16a34a,#22c55e);}
+.opt-btn.correct .opt-key{background:#16a34a;border-color:#16a34a;color:#fff;box-shadow:0 0 12px rgba(22,163,74,0.5);}
+.opt-btn.wrong{border-color:var(--red);background:rgba(232,25,44,0.05);box-shadow:0 0 24px -6px rgba(232,25,44,0.25);}
+.opt-btn.wrong::before{opacity:1;background:linear-gradient(180deg,var(--red),var(--red2));}
+.opt-btn.wrong .opt-key{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 12px rgba(232,25,44,0.4);}
+.opt-btn:disabled{cursor:default;}
+.expl-box{background:rgba(255,245,243,0.9);border:1px solid rgba(232,25,44,0.15);border-left:3px solid var(--red);border-radius:14px;padding:20px 24px;font-size:14px;line-height:1.72;color:var(--muted);margin-bottom:26px;backdrop-filter:blur(10px);animation:slideDown 0.35s cubic-bezier(0.22,1,0.36,1);box-shadow:0 4px 20px rgba(232,25,44,0.06);}
+.expl-box strong{color:var(--text);}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.btn-next{display:inline-flex;align-items:center;gap:10px;padding:14px 30px;background:rgba(255,255,255,0.7);border:1px solid rgba(232,25,44,0.18);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer;backdrop-filter:blur(12px);transition:all 0.22s;box-shadow:0 2px 10px rgba(232,25,44,0.06);}
+.btn-next:hover{border-color:rgba(232,25,44,0.4);color:var(--red);background:rgba(255,255,255,0.95);box-shadow:0 4px 20px rgba(232,25,44,0.12);}
+#screen-results{padding-top:60px;text-align:center;}
+.result-ring-wrap{display:flex;justify-content:center;margin-bottom:44px;}
+.result-ring{position:relative;width:168px;height:168px;}
+.ring-svg{transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:rgba(232,25,44,0.1);stroke-width:7;}
+.ring-fill{fill:none;stroke:url(#rg);stroke-width:7;stroke-linecap:round;stroke-dasharray:452;stroke-dashoffset:452;transition:stroke-dashoffset 1.3s cubic-bezier(0.22,1,0.36,1);filter:drop-shadow(0 0 8px rgba(232,25,44,0.5));}
+.ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring-score{font-family:'Orbitron',monospace;font-size:38px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--red3),var(--red),var(--red2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.ring-denom{font-family:'Orbitron',monospace;font-size:13px;color:var(--muted);margin-top:3px;}
+.result-title{font-family:'Orbitron',monospace;font-size:clamp(24px,4vw,40px);font-weight:900;letter-spacing:-0.02em;margin-bottom:12px;background:linear-gradient(110deg,var(--red3),var(--red),var(--red2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.result-sub{font-size:15px;color:var(--muted);margin-bottom:52px;}
+.recap{text-align:left;margin-bottom:48px;background:rgba(255,255,255,0.75);border:1px solid rgba(232,25,44,0.1);border-radius:18px;overflow:hidden;backdrop-filter:blur(18px);box-shadow:0 4px 24px rgba(232,25,44,0.07);}
+.recap-item{display:flex;align-items:flex-start;gap:16px;padding:18px 24px;border-bottom:1px solid rgba(232,25,44,0.07);font-size:14px;line-height:1.5;}
+.recap-item:last-child{border-bottom:none;}
+.recap-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.recap-dot.ok{background:#16a34a;box-shadow:0 0 6px rgba(22,163,74,0.5);}
+.recap-dot.ko{background:var(--red);box-shadow:0 0 6px rgba(232,25,44,0.4);}
+.recap-cat{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:0.1em;color:var(--red);margin-bottom:3px;}
+.recap-q{color:var(--text);font-weight:500;margin-bottom:3px;}
+.recap-a{font-family:'Orbitron',monospace;font-size:11px;color:var(--red);letter-spacing:0.04em;opacity:0.75;}
+.result-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
+.btn-restart{display:inline-flex;align-items:center;gap:12px;padding:17px 40px;background:transparent;cursor:pointer;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;border-radius:12px;transition:all 0.3s;border:1.5px solid var(--red);color:var(--red);}
+.btn-restart:hover{background:rgba(232,25,44,0.06);box-shadow:0 0 28px rgba(232,25,44,0.2);transform:translateY(-3px);}
+.btn-retry{display:inline-flex;align-items:center;gap:12px;padding:17px 40px;cursor:pointer;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;border-radius:12px;transition:all 0.3s;border:none;background:linear-gradient(135deg,var(--red3),var(--red),var(--red2));color:#fff;}
+.btn-retry:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(232,25,44,0.35);}
+.btn-retry:disabled{background:rgba(26,6,8,0.08);color:rgba(26,6,8,0.25);cursor:not-allowed;transform:none;box-shadow:none;}
+.revision-badge{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;padding:5px 14px;border-radius:100px;background:rgba(232,25,44,0.1);border:1px solid rgba(232,25,44,0.3);color:var(--red);margin-bottom:20px;}
+.revision-badge::before{content:'↺';margin-right:2px;}
+code{font-family:'Orbitron',monospace;font-size:11px;background:rgba(232,25,44,0.07);color:var(--red);padding:2px 7px;border-radius:5px;border:1px solid rgba(232,25,44,0.12);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+
+/* DARK MODE */
+body.dark{--bg:#0e0608;--bg2:#160809;--text:#f5eced;--muted:rgba(245,236,237,0.45);--glass:rgba(255,255,255,0.04);--gborder:rgba(232,25,44,0.2);--ghover:rgba(255,255,255,0.07);--shadow:rgba(232,25,44,0.2);}
+body.dark .aurora-blob:nth-child(1){opacity:0.2;}
+body.dark .aurora-blob:nth-child(2){opacity:0.25;background:radial-gradient(circle,#7a0010,#e8192c);}
+body.dark .aurora-blob:nth-child(3){opacity:0.12;}
+body.dark .langue-header{background:linear-gradient(135deg,rgba(232,25,44,0.1),rgba(180,0,20,0.06));border-color:rgba(232,25,44,0.25);box-shadow:0 4px 24px rgba(232,25,44,0.12);}
+body.dark .langue-icon-wrap{background:linear-gradient(135deg,rgba(232,25,44,0.18),rgba(255,77,26,0.1));}
+body.dark .subcat-card{background:rgba(255,255,255,0.03);border-color:rgba(232,25,44,0.12);box-shadow:0 2px 12px rgba(0,0,0,0.3);}
+body.dark .subcat-card:hover{background:rgba(255,255,255,0.06);}
+body.dark .subcat-card.selected{background:rgba(255,255,255,0.06);}
+body.dark .subcat-icon{background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03));border-color:rgba(255,255,255,0.08);}
+body.dark .langue-locked-card{background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.05);}
+body.dark .langue-locked-card::after{background:rgba(14,6,8,0.55);}
+body.dark .locked-name{color:rgba(245,236,237,0.25);}
+body.dark .locked-desc{color:rgba(245,236,237,0.18);}
+body.dark .question-card{background:rgba(255,255,255,0.04);border-color:rgba(232,25,44,0.15);box-shadow:0 4px 32px rgba(0,0,0,0.4);}
+body.dark .opt-btn{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.07);box-shadow:none;}
+body.dark .opt-btn:hover:not(:disabled){background:rgba(232,25,44,0.07);border-color:rgba(232,25,44,0.3);}
+body.dark .opt-key{background:rgba(232,25,44,0.1);border-color:rgba(232,25,44,0.2);}
+body.dark .expl-box{background:rgba(232,25,44,0.06);border-color:rgba(232,25,44,0.2);}
+body.dark .btn-next{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);}
+body.dark .btn-next:hover{background:rgba(232,25,44,0.08);border-color:rgba(232,25,44,0.4);}
+body.dark .recap{background:rgba(255,255,255,0.03);border-color:rgba(232,25,44,0.12);box-shadow:none;}
+body.dark .recap-item{border-bottom-color:rgba(255,255,255,0.05);}
+body.dark .score-hud{background:rgba(255,255,255,0.04);}
+body.dark .btn-select-all{background:rgba(232,25,44,0.08);}
+body.dark .progress-track{background:rgba(232,25,44,0.15);}
+body.dark .ring-bg{stroke:rgba(232,25,44,0.15);}
+body.dark .btn-start:disabled{background:rgba(255,255,255,0.04);color:rgba(245,236,237,0.2);border-color:rgba(255,255,255,0.07);}
+body.dark .btn-retry:disabled{background:rgba(255,255,255,0.05);color:rgba(245,236,237,0.2);}
+
+/* TOGGLE */
+.theme-toggle{display:flex;align-items:center;gap:10px;}
+.toggle-btn{position:relative;width:48px;height:26px;background:rgba(232,25,44,0.12);border:1.5px solid rgba(232,25,44,0.3);border-radius:100px;cursor:pointer;transition:all 0.3s;flex-shrink:0;}
+.toggle-btn::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--red2));transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 2px 6px rgba(232,25,44,0.4);}
+body.dark .toggle-btn::after{transform:translateX(22px);box-shadow:0 2px 10px rgba(232,25,44,0.5);}
+.toggle-icon{font-size:14px;user-select:none;}
+</style>
+</head>
+<body>
+<div class="aurora">
+  <div class="aurora-blob"></div>
+  <div class="aurora-blob"></div>
+  <div class="aurora-blob"></div>
+</div>
+<div class="app">
+  <header class="header">
+    <div class="logo"><span class="logo-az">AZ</span><span class="logo-sep">·</span><span class="logo-qcm">QCM</span></div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="theme-toggle">
+        <span class="toggle-icon" id="toggle-icon">☀️</span>
+        <button class="toggle-btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Changer de thème"></button>
+      </div>
+      <div class="score-hud" id="score-hud">——</div>
+    </div>
+  </header>
+  <main class="main">
+
+    <!-- HOME -->
+    <div id="screen-home" class="screen">
+      <div class="hero">
+        <div class="hero-eyebrow">Holberton School · AI Engineer Augmented</div>
+        <h1 class="hero-title"><span class="t1">TEST TES</span><span class="t2">SKILLS</span></h1>
+        <p class="hero-desc">Choisis tes thèmes, réponds aux questions.<br>Chaque erreur est une leçon — pas un échec.</p>
+      </div>
+      <div class="langue-block">
+        <div class="langue-header">
+          <div class="langue-icon-wrap">⚙️</div>
+          <div class="langue-info">
+            <div class="langue-name">Langage C</div>
+            <div class="langue-meta" id="c-meta">Sélectionne des thèmes ci-dessous</div>
+          </div>
+          <button class="btn-select-all" id="btn-all" onclick="selectAll()">Tout sélectionner</button>
+        </div>
+        <div class="subcat-grid" id="subcat-grid"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="langue-locked-wrap">
+        <div class="langue-locked-card">
+          <div class="locked-icon">🐍</div>
+          <div class="locked-text">
+            <div class="locked-name">Python <span class="locked-badge">À VENIR</span></div>
+            <div class="locked-desc">Bases, syntaxe, POO, data science. Disponible Trimestre 2.</div>
+          </div>
+          <div class="locked-padlock">🔒</div>
+        </div>
+      </div>
+      <div class="start-wrap">
+        <div class="start-hint" id="start-hint">Sélectionne au moins un thème pour commencer</div>
+        <button class="btn-start" id="btn-start" disabled onclick="startQuiz()">Lancer le QCM <span class="btn-arrow">→</span></button>
+      </div>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="screen-quiz" class="screen" style="display:none">
+      <div class="progress-track"><div class="progress-glow" id="pfill" style="width:0%"></div></div>
+      <div class="q-header">
+        <div class="q-badge" id="qbadge">—</div>
+        <div class="q-num" id="qnum">0 / 0</div>
+      </div>
+      <div class="question-card"><div class="question-text" id="qtext">—</div></div>
+      <div class="options-list" id="opts"></div>
+      <div class="expl-box" id="expl" style="display:none"></div>
+      <button class="btn-next" id="btn-next" style="display:none" onclick="nextQ()">Continuer <span>→</span></button>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="screen-results" class="screen" style="display:none">
+      <div class="result-ring-wrap">
+        <div class="result-ring">
+          <svg class="ring-svg" width="168" height="168" viewBox="0 0 168 168">
+            <defs>
+              <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#c0001a"/>
+                <stop offset="50%" style="stop-color:#e8192c"/>
+                <stop offset="100%" style="stop-color:#ff4d1a"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-bg" cx="84" cy="84" r="72"/>
+            <circle class="ring-fill" id="rfill" cx="84" cy="84" r="72"/>
+          </svg>
+          <div class="ring-inner">
+            <div class="ring-score" id="rscore">0</div>
+            <div class="ring-denom" id="rdenom">/ 0</div>
+          </div>
+        </div>
+      </div>
+      <div id="revision-badge" class="revision-badge" style="display:none">Mode révision des erreurs</div>
+      <h2 class="result-title" id="rtitle">—</h2>
+      <p class="result-sub" id="rsub">—</p>
+      <div class="recap" id="recap"></div>
+      <div class="result-actions">
+        <button class="btn-retry" id="btn-retry" onclick="retryErrors()">↺ Refaire mes erreurs</button>
+        <button class="btn-restart" onclick="goHome()">← Recommencer</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+<script>
+/* ══════════════════════════════════════════
+   SYNTAX HIGHLIGHTER — plain text → HTML
+══════════════════════════════════════════ */
+function highlight(raw) {
+  const esc = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return esc
+    // comments first
+    .replace(/(\/\*[\s\S]*?\*\/|\/\/[^\n]*)/g, '<span class="cc">$1</span>')
+    // strings
+    .replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g, '<span class="cs">$1</span>')
+    // keywords
+    .replace(/\b(int|char|void|return|if|else|for|while|do|struct|typedef|sizeof|const|static|unsigned|long|short|float|double|NULL|true|false)\b/g, '<span class="ck">$1</span>')
+    // numbers
+    .replace(/\b(\d+)\b/g, '<span class="cn">$1</span>')
+    // function calls
+    .replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g, '<span class="cf">$1</span>');
+}
+
+/* ══════════════════════════════════════════
+   DATA  (code as plain template strings)
+══════════════════════════════════════════ */
+const SUBCATS = {
+
+"Pointeurs": { icon:"📌", cc:"#b44fff", questions:[
+  {q:"Que stocke un pointeur en C ?",opts:["Une valeur entière","L'adresse mémoire d'une variable","Une copie de la variable","La taille de la variable"],answer:1,expl:"Un pointeur stocke une <strong>adresse mémoire</strong>. <code>int *p = &x</code> → p contient l'adresse de x en RAM, pas sa valeur."},
+  {q:"Que fait l'opérateur '*' appliqué à un pointeur ?",opts:["Multiplie le pointeur","Déclare un nouveau pointeur","Déréférence — accède à la valeur pointée","Retourne l'adresse du pointeur"],answer:2,expl:"<code>*p</code> <strong>déréférence</strong> le pointeur : accède à la valeur à l'adresse stockée. Si <code>p = &x</code>, alors <code>*p == x</code>. Modifier <code>*p</code> modifie x directement."},
+  {q:"Différence entre 'int *p' et 'int **p' ?",opts:["Aucune","*p → int, **p → pointeur vers pointeur vers int","**p → int, *p est un double","**p est invalide en C"],answer:1,expl:"<code>int *p</code> → pointeur vers int. <code>int **p</code> → pointeur vers pointeur vers int. Double pointeurs utiles pour modifier un pointeur depuis une fonction, ou tableaux 2D dynamiques."},
+  {q:"Qu'est-ce qu'un pointeur NULL ?",opts:["Un pointeur non initialisé","Un pointeur valant 0 — ne pointe sur rien de valide","Un pointeur vers une valeur 0","Un pointeur détruit par free()"],answer:1,expl:"NULL vaut 0 (ou (void*)0). Déréférencer NULL → segfault garanti. Toujours initialiser à NULL et tester avant déréférencement."},
+  {q:"Que fait p+1 si p est un 'int *' et qu'un int fait 4 octets ?",opts:["Avance de 1 octet","Avance de 4 octets","Avance de 8 octets","Erreur de compilation"],answer:1,expl:"L'arithmétique de pointeur avance par <strong>blocs de sizeof(type)</strong>. Sur <code>int*</code>, p+1 = +4 octets. Sur <code>char*</code>, p+1 = +1 octet."},
+  {q:"Quelle est la différence entre '*p++' et '(*p)++' ?",opts:["Aucune","*p++ incrémente le pointeur, (*p)++ incrémente la valeur pointée","*p++ incrémente la valeur, (*p)++ incrémente le pointeur","Les deux incrémentent le pointeur"],answer:1,expl:"La précédence : <code>*p++</code> = <code>*(p++)</code> → accède à *p puis avance le pointeur. <code>(*p)++</code> → incrémente la valeur à l'adresse pointée. Piège classique en C."},
+  {q:"Qu'est-ce qu'un dangling pointer ?",opts:["Un pointeur NULL","Un pointeur qui pointe vers de la mémoire libérée ou invalide","Un pointeur vers une constante","Un pointeur non initialisé"],answer:1,expl:"Un <strong>dangling pointer</strong> pointe vers de la mémoire qui a été libérée (après free()) ou qui est hors scope. Le déréférencer est un undefined behavior. Solution : mettre à NULL après free()."},
+  {q:"Que retourne &arr[0] pour un tableau 'int arr[5]' ?",opts:["La valeur du 1er élément","Un pointeur vers le 1er élément du tableau","La taille du tableau","L'adresse du tableau lui-même"],answer:1,expl:"<code>&arr[0]</code> et <code>arr</code> sont équivalents : tous deux donnent l'adresse du premier élément. C'est le fondement de la relation tableau-pointeur en C."},
+  {q:"Peut-on faire de l'arithmétique sur un pointeur void* ?",opts:["Oui, comme sur n'importe quel pointeur","Non — void* n'a pas de taille de type, interdit par le standard C","Oui, mais seulement +1","Non, car void* est toujours NULL"],answer:1,expl:"Le standard C interdit l'arithmétique sur <code>void*</code> car le compilateur ne connaît pas la taille du type pointé. Il faut caster vers un type concret d'abord. GCC l'autorise comme extension (traite comme char*)."},
+  {q:"Quelle est la taille d'un pointeur sur un système 64 bits ?",opts:["4 octets","8 octets","2 octets","Dépend du type pointé"],answer:1,expl:"Sur un système 64 bits, tout pointeur fait <strong>8 octets</strong> (64 bits), quelle que soit la taille du type pointé. Sur 32 bits : 4 octets. La taille d'un pointeur est indépendante du type qu'il pointe."},
+  {q:"Que fait ce code ?",code:`int x = 42;\nint *p = &x;\n*p = 100;\nprintf("%d\\n", x);`,opts:["Affiche 42","Affiche 100","Segfault","Comportement indéfini"],answer:1,expl:"<code>p</code> pointe vers <code>x</code>. <code>*p = 100</code> modifie la valeur à l'adresse de x → x vaut 100. printf affiche <strong>100</strong>."},
+  {q:"Que fait ce code ?",code:`int *p = NULL;\nprintf("%d\\n", *p);`,opts:["Affiche 0","Affiche NULL","Segfault — déréférencement de NULL","Comportement défini"],answer:2,expl:"Déréférencer un pointeur NULL provoque un <strong>segfault</strong> (SIGSEGV) sur la plupart des systèmes. Ne jamais déréférencer sans vérifier que le pointeur n'est pas NULL."},
+  {q:"Quelle est la valeur de 'b' après ce code ?",code:`int a = 5;\nint *p = &a;\nint b = *p + 3;`,opts:["5","3","8","Indéfinie"],answer:2,expl:"<code>*p</code> déréférence p → vaut 5. <code>*p + 3</code> = 5 + 3 = <strong>8</strong>. b vaut 8."},
+  {q:"Que fait ce code ?",code:`int arr[] = {10, 20, 30};\nint *p = arr;\nprintf("%d\\n", *(p + 2));`,opts:["10","20","30","Segfault"],answer:2,expl:"<code>p</code> pointe sur arr[0]. <code>p+2</code> avance de 2×sizeof(int) → pointe sur arr[2] = <strong>30</strong>. <code>*(p+2)</code> équivaut à <code>arr[2]</code>."}
+]},
+
+"Malloc / Mémoire": { icon:"🧠", cc:"#ff4f8b", questions:[
+  {q:"Quelle fonction libère la mémoire allouée dynamiquement ?",opts:["delete()","destroy()","free()","release()"],answer:2,expl:"<code>free(ptr)</code> libère la mémoire allouée par malloc/calloc/realloc. Après free(), mettre le pointeur à NULL pour éviter le dangling pointer."},
+  {q:"Que fait malloc(0) selon C99 ?",opts:["Retourne toujours NULL","Retourne un pointeur valide ou NULL selon l'implémentation","Undefined behavior","Alloue 1 octet"],answer:1,expl:"<code>malloc(0)</code> peut retourner un pointeur non-NULL ou NULL selon l'implémentation. Ne pas déréférencer, mais bien libérer avec free()."},
+  {q:"Différence entre malloc() et calloc() ?",opts:["Aucune","calloc() initialise à zéro, malloc() laisse non initialisé","malloc() est plus lent","calloc() ne prend qu'un argument"],answer:1,expl:"<code>malloc(n)</code> alloue n octets non initialisés. <code>calloc(n, size)</code> alloue n×size octets mis à <strong>zéro</strong>."},
+  {q:"Qu'est-ce qu'un memory leak ?",opts:["Un crash du programme","De la mémoire allouée jamais libérée","Un accès hors limites","Une variable non initialisée"],answer:1,expl:"Memory leak = mémoire allouée avec malloc() sans jamais être libérée. S'accumule, finit par épuiser la RAM. Détectable avec Valgrind."},
+  {q:"Que fait free(NULL) ?",opts:["Segfault","Undefined behavior","Ne fait rien — garanti par le standard","Libère 0 octet"],answer:2,expl:"<code>free(NULL)</code> est sûr et garanti par le standard C. Ne fait rien."},
+  {q:"Que fait realloc(ptr, 0) ?",opts:["Agrandit la zone à 0","Équivalent à free(ptr) — comportement défini par l'implémentation","Retourne toujours NULL","Undefined behavior"],answer:1,expl:"<code>realloc(ptr, 0)</code> est équivalent à free(ptr) selon le standard, mais peut retourner NULL ou un pointeur non-NULL. Mieux vaut appeler free() explicitement."},
+  {q:"Qu'est-ce qu'un double free ?",opts:["Allouer deux fois la même variable","Appeler free() deux fois sur le même pointeur","Libérer deux pointeurs en même temps","Allouer puis libérer immédiatement"],answer:1,expl:"<strong>Double free</strong> = free() appelé deux fois sur le même pointeur. Undefined behavior qui corrompt le heap."},
+  {q:"Valeur retournée par malloc() en cas d'échec ?",opts:["0","NULL","-1","Un pointeur invalide"],answer:1,expl:"malloc() retourne <strong>NULL</strong> en cas d'échec. Toujours vérifier le retour avant d'utiliser le pointeur."},
+  {q:"Où est stockée la mémoire allouée par malloc() ?",opts:["Stack (pile)","Registres CPU","Heap (tas)","Segment BSS"],answer:2,expl:"La mémoire dynamique est allouée sur le <strong>heap</strong>. Le heap est géré manuellement, contrairement à la stack qui est automatique."},
+  {q:"Différence entre malloc(n) et malloc(n * sizeof(int)) ?",opts:["Aucune si n est en octets","malloc(n) alloue n octets, malloc(n*sizeof(int)) alloue n entiers","malloc(n*sizeof(int)) est incorrect","Toujours équivalents"],answer:1,expl:"<code>malloc(n)</code> = n octets. <code>malloc(n*sizeof(int))</code> = espace pour n entiers. Toujours utiliser sizeof() pour être portable."},
+  {q:"Quel est le bug dans ce code ?",code:`int *tab = malloc(10 * sizeof(int));\ntab[0] = 42;\nfree(tab);\nfree(tab);`,opts:["Aucun bug","Double free — undefined behavior","malloc doit être castée","tab[0] est hors limites"],answer:1,expl:"<strong>Double free</strong> : appeler free() deux fois = undefined behavior. Ça corrompt le heap. Solution : <code>tab = NULL</code> après le premier free()."},
+  {q:"Que manque-t-il dans ce code ?",code:`int *p = malloc(sizeof(int));\n*p = 42;\nprintf("%d\\n", *p);`,opts:["Un cast de malloc","Une vérification que malloc n'a pas retourné NULL","Un free() à la fin","Rien, ce code est correct"],answer:1,expl:"malloc peut retourner NULL. Sans vérification, <code>*p = 42</code> déréférence NULL → segfault. Toujours <code>if (!p) { /* erreur */ }</code> après malloc."},
+  {q:"Combien d'octets alloue ce code ?",code:`char *s = malloc(5 * sizeof(char));`,opts:["4 octets","5 octets","8 octets","20 octets"],answer:1,expl:"sizeof(char) vaut toujours 1. Donc 5 × 1 = <strong>5 octets</strong>. Suffisant pour 4 caractères + '\\0'."},
+  {q:"Quel est le problème dans ce code ?",code:`int *p = malloc(10 * sizeof(int));\nfree(p);\np[0] = 5; /* utilisation après free */`,opts:["Aucun problème","Utilisation de mémoire libérée — undefined behavior","malloc est trop petit","Il faut recaster p après free"],answer:1,expl:"<strong>Use-after-free</strong> : accéder à de la mémoire après free() = undefined behavior et vulnérabilité de sécurité grave. Toujours mettre le pointeur à NULL après free()."}
+]},
+
+"Pointeurs de fonctions": { icon:"🔗", cc:"#4fffff", questions:[
+  {q:"Comment déclare-t-on un pointeur vers une fonction (int) → int ?",opts:["int *f(int)","int (*f)(int)","int f*(int)","(*int) f(int)"],answer:1,expl:"Syntaxe : <code>type (*nom)(params)</code>. Les parenthèses autour de <code>*f</code> sont obligatoires — sans elles, c'est une fonction retournant int*."},
+  {q:"À quoi servent principalement les pointeurs de fonctions ?",opts:["Accélérer l'exécution","Callbacks, polymorphisme C, tables de dispatch","Gérer la mémoire dynamique","Remplacer les variables globales"],answer:1,expl:"Callbacks, tables de dispatch, polymorphisme en C pur."},
+  {q:"Syntaxe pour appeler une fonction via 'fptr' avec l'argument 42 ?",opts:["fptr->42","call fptr(42)","fptr(42) ou (*fptr)(42)","&fptr(42)"],answer:2,expl:"<code>fptr(42)</code> et <code>(*fptr)(42)</code> sont toutes deux valides."},
+  {q:"Comment assigne-t-on la fonction 'add' à un pointeur de fonction 'fptr' ?",opts:["fptr = &add ou fptr = add — les deux sont corrects","fptr = *add","fptr -> add","fptr == add"],answer:0,expl:"<code>fptr = add</code> et <code>fptr = &add</code> sont équivalents — le nom de fonction est converti en pointeur."},
+  {q:"Qu'est-ce qu'une table de dispatch ?",opts:["Une table de symboles du compilateur","Un tableau de pointeurs de fonctions pour exécuter du code selon un index","Une liste chaînée de callbacks","Un registre CPU"],answer:1,expl:"Un tableau de pointeurs de fonctions. Au lieu d'un switch/if-else, on indexe directement la bonne fonction."},
+  {q:"Peut-on stocker plusieurs pointeurs de fonctions de même signature dans un tableau ?",opts:["Non","Oui — c'est la base des dispatch tables","Oui, mais seulement 2","Oui, mais uniquement avec typedef"],answer:1,expl:"<code>int (*ops[4])(int, int) = {add, sub, mul, div};</code> — c'est exactement la dispatch table."},
+  {q:"Que fait typedef avec un pointeur de fonction ?",opts:["Le rend plus lent","Crée un alias lisible pour la signature","L'interdit en C","Le transforme en fonction normale"],answer:1,expl:"<code>typedef int (*Op)(int, int);</code> → on écrit <code>Op fptr = add;</code> au lieu de <code>int (*fptr)(int, int) = add;</code>."},
+  {q:"Comment passe-t-on un pointeur de fonction comme argument ?",opts:["On ne peut pas","Comme n'importe quel argument — en le déclarant dans la signature","Uniquement via void*","Via une macro"],answer:1,expl:"<code>void apply(int (*f)(int), int x)</code> accepte une fonction (int)→int. Appel : <code>apply(double_it, 5)</code>."},
+  {q:"Signature d'un pointeur vers une fonction sans paramètre et sans retour ?",opts:["void f()","void (*f)(void)","(*void) f","void *f()"],answer:1,expl:"<code>void (*f)(void)</code>. Le <code>void</code> entre parenthèses est explicite — sans, ça signifie 'paramètres non spécifiés' en C."},
+  {q:"Quelle bibliothèque standard utilise intensément les pointeurs de fonctions ?",opts:["<math.h>","<stdlib.h> — notamment qsort() et bsearch()","<string.h>","<stdio.h>"],answer:1,expl:"<code>qsort()</code> prend un comparateur <code>int (*compar)(const void*, const void*)</code>. Exemple canonique de callback en C."},
+  {q:"Que fait ce code ?",code:`int add(int a, int b) { return a + b; }\nint mul(int a, int b) { return a * b; }\n\nint (*op)(int, int) = add;\nprintf("%d\\n", op(3, 4));`,opts:["Affiche 7","Affiche 12","Erreur de compilation","Segfault"],answer:0,expl:"<code>op</code> pointe vers <code>add</code>. <code>op(3, 4)</code> = <code>add(3, 4)</code> = <strong>7</strong>."},
+  {q:"Que fait ce code avec une dispatch table ?",code:`int add(int a, int b){ return a+b; }\nint sub(int a, int b){ return a-b; }\nint (*ops[2])(int,int) = {add, sub};\nprintf("%d\\n", ops[1](10, 3));`,opts:["Affiche 13","Affiche 7","Erreur de compilation","Segfault"],answer:1,expl:"<code>ops[1]</code> = <code>sub</code>. <code>ops[1](10, 3)</code> = <code>sub(10, 3)</code> = <strong>7</strong>."},
+  {q:"Que fait ce code avec typedef ?",code:`typedef int (*Calc)(int, int);\nint mul(int a, int b){ return a * b; }\nCalc f = mul;\nprintf("%d\\n", f(6, 7));`,opts:["Erreur — typedef invalide","Affiche 42","Affiche 13","Segfault"],answer:1,expl:"<code>Calc</code> est un alias pour le type pointeur de fonction. <code>f = mul</code> est valide. <code>f(6, 7)</code> = <code>mul(6, 7)</code> = <strong>42</strong>."}
+]},
+
+"Récursion": { icon:"🔄", cc:"#aaff4f", questions:[
+  {q:"Qu'est-ce qu'un cas de base en récursion ?",opts:["Le premier appel","La condition qui stoppe les appels récursifs","La valeur de retour","L'argument de la fonction"],answer:1,expl:"Le <strong>cas de base</strong> = condition d'arrêt. Sans lui, récursion infinie → stack overflow."},
+  {q:"Pourquoi une récursion infinie provoque un stack overflow ?",opts:["Elle utilise trop de heap","Chaque appel empile un frame — stack de taille limitée","Le CPU surchauffe","Le compilateur l'interdit"],answer:1,expl:"Chaque appel récursif empile un <strong>stack frame</strong>. La stack est limitée (~1–8 MB). Trop d'appels → segfault."},
+  {q:"Cas de base correct pour factorielle récursive ?",opts:["n == 1 retourne n","n == 0 retourne 1","n < 0 retourne 0","n > 1 retourne n"],answer:1,expl:"<code>if (n == 0) return 1</code> — car 0! = 1 par définition. Gère aussi l'appel avec 0."},
+  {q:"Qu'est-ce que la tail recursion ?",opts:["Récursion sans cas de base","L'appel récursif est la dernière opération — optimisable en boucle","Récursion retournant toujours 0","Récursion avec plusieurs cas de base"],answer:1,expl:"<strong>Tail recursion</strong> : l'appel récursif est la dernière opération. Certains compilateurs (-O2) la transforment en boucle."},
+  {q:"Complexité temporelle de Fibonacci récursif naïf ?",opts:["O(n)","O(n log n)","O(2^n)","O(n²)"],answer:2,expl:"Fibonacci récursif naïf = <strong>O(2^n)</strong> — chaque appel génère 2 appels, beaucoup sont recalculés. Solution : mémoïsation → O(n)."},
+  {q:"Qu'est-ce que la mémoïsation ?",opts:["Un pattern de récursion infinie","Stocker les résultats déjà calculés pour éviter les recalculs","Optimiser le compilateur","Un type de tail recursion"],answer:1,expl:"La <strong>mémoïsation</strong> stocke les résultats déjà calculés. Fibonacci O(2^n) → O(n) avec mémoïsation. Base de la programmation dynamique."},
+  {q:"Différence entre récursion directe et indirecte ?",opts:["Aucune","Directe : f() s'appelle elle-même. Indirecte : f() appelle g() qui appelle f()","Directe est plus rapide","Indirecte n'est pas autorisée en C"],answer:1,expl:"<strong>Directe</strong> : f() s'appelle elle-même. <strong>Indirecte</strong> : A appelle B qui rappelle A. Les deux sont valides en C."},
+  {q:"Peut-on toujours remplacer une récursion par une boucle ?",opts:["Non — certains problèmes sont naturellement récursifs","Oui — toute récursion est convertible en itération (éventuellement avec une stack explicite)","Oui, mais seulement pour la tail recursion","Non — les compilateurs C l'interdisent"],answer:1,expl:"Oui — tout algorithme récursif peut être converti en itératif. Les non-tail nécessitent une stack explicite."},
+  {q:"Profondeur maximale de récursion typique sous Linux ?",opts:["100 appels","~8000–10000 appels selon la taille des frames","Illimitée","Exactement 1024 appels"],answer:1,expl:"Stack par défaut Linux ~8 MB. Avec frames de ~1 KB → ~8000 appels max. Dépend de la taille des variables locales."},
+  {q:"Qu'est-ce que la récursion mutuelle ?",opts:["Récursion avec deux cas de base","Deux fonctions qui s'appellent mutuellement","Récursion retournant deux valeurs","Récursion en tail position uniquement"],answer:1,expl:"<strong>Récursion mutuelle</strong> : f() appelle g() et g() appelle f(). Exemple : is_even/is_odd."},
+  {q:"Que retourne cette fonction avec n=5 ?",code:`int fact(int n)\n{\n    if (n == 0)\n        return 1;\n    return n * fact(n - 1);\n}`,opts:["5","24","120","Infini"],answer:2,expl:"fact(5) = 5×4×3×2×1 = <strong>120</strong>. Le cas de base n==0 retourne 1 et arrête la récursion."},
+  {q:"Que se passe-t-il si on appelle cette fonction ?",code:`int boom(int n)\n{\n    return n + boom(n - 1);\n}`,opts:["Retourne 0","Stack overflow à l'exécution","Erreur de compilation","Retourne n"],answer:1,expl:"Aucun cas de base → appels infinis → <strong>stack overflow</strong> (segfault). Le compilateur ne détecte pas ce bug."},
+  {q:"Que retourne fib(4) ?",code:`int fib(int n)\n{\n    if (n <= 1)\n        return n;\n    return fib(n - 1) + fib(n - 2);\n}`,opts:["3","4","5","2"],answer:0,expl:"fib(4) = fib(3)+fib(2) = (fib(2)+fib(1))+(fib(1)+fib(0)) = (1+1+1)+(1+0) = <strong>3</strong>. Séquence : 0,1,1,2,3,5..."},
+  {q:"Cette fonction est-elle tail-recursive ?",code:`int sum(int n)\n{\n    if (n == 0)\n        return 0;\n    return n + sum(n - 1);\n}`,opts:["Oui","Non — n + sum(n-1) fait une opération APRÈS l'appel récursif","Oui si compilée avec -O2","Non car elle retourne un int"],answer:1,expl:"<strong>Non</strong> : après <code>sum(n-1)</code>, il faut encore faire <code>n + résultat</code>. Version tail-recursive : utiliser un accumulateur <code>sum(n-1, acc+n)</code>."}
+]},
+
+"Variadic Functions": { icon:"∞", cc:"#ffb347", questions:[
+  {q:"Quel header inclure pour les fonctions variadiques ?",opts:["<stdlib.h>","<string.h>","<stdarg.h>","<vararg.h>"],answer:2,expl:"<code>&lt;stdarg.h&gt;</code> fournit <code>va_list</code>, <code>va_start</code>, <code>va_arg</code>, <code>va_end</code>."},
+  {q:"Que fait va_start(ap, last) ?",opts:["Démarre une boucle","Initialise ap après le dernier paramètre nommé 'last'","Alloue la mémoire","Retourne le nombre d'arguments"],answer:1,expl:"<code>va_start(ap, last)</code> initialise <code>va_list ap</code> pour pointer juste après <code>last</code>. Toujours terminer avec <code>va_end(ap)</code>."},
+  {q:"Comment connaît-on le nombre d'arguments variadiques ?",opts:["Via va_count()","Automatiquement via va_list","Le développeur doit le gérer (count ou sentinel)","Le compilateur le calcule"],answer:2,expl:"C ne fournit <strong>aucun moyen automatique</strong>. Soit on passe un entier de count, soit une valeur sentinel."},
+  {q:"Syntaxe minimale d'une fonction variadique ?",opts:["void f(...)","void f(int n, ...)","void f(... args)","void f(va_list ap)"],answer:1,expl:"Au moins un paramètre nommé avant <code>...</code> est obligatoire : <code>void f(int n, ...)</code>."},
+  {q:"Que fait va_arg(ap, type) ?",opts:["Revient au premier argument","Retourne et avance vers l'argument suivant du type spécifié","Compte les arguments restants","Libère la mémoire"],answer:1,expl:"<code>va_arg(ap, type)</code> retourne l'argument courant casté en <code>type</code> ET avance ap vers le suivant. Mauvais type = undefined behavior."},
+  {q:"Pourquoi doit-on appeler va_end(ap) ?",opts:["Pour libérer de la mémoire","C'est requis par le standard — certaines ABI en ont besoin","Pour réinitialiser le compteur","Pour retourner au début de la liste"],answer:1,expl:"Le standard exige <code>va_end(ap)</code>. Certaines ABI utilisent va_end pour du nettoyage. Omettre = undefined behavior portable."},
+  {q:"Peut-on passer un 'char' directement comme argument variadique ?",opts:["Oui sans problème","Non — les char sont promus en int","Oui, mais seulement avec typedef","Non, il faut le caster en void*"],answer:1,expl:"En C, les arguments variadiques subissent des <strong>promotions par défaut</strong> : char → int, float → double. Utiliser <code>va_arg(ap, int)</code> pour un char."},
+  {q:"Comment printf() sait-il combien d'arguments traiter ?",opts:["Via va_count()","Il analyse la format string pour compter les %","Il lit jusqu'à NULL","Le compilateur le lui dit"],answer:1,expl:"printf() parse la <strong>format string</strong> et compte les spécificateurs (<code>%d</code>, <code>%s</code>...). Mauvais format = undefined behavior."},
+  {q:"Peut-on copier un va_list pour le parcourir deux fois ?",opts:["Non","Oui — avec va_copy(dest, src) défini en C99","Oui — en assignant va_list b = a","Oui, mais seulement sur Linux"],answer:1,expl:"<code>va_copy(dest, src)</code> (C99) crée une copie indépendante. Ne pas oublier <code>va_end</code> sur la copie."},
+  {q:"Que fait cette fonction avec l'appel sum(3, 10, 20, 30) ?",code:`int sum(int count, ...)\n{\n    va_list ap;\n    va_start(ap, count);\n    int total = 0;\n    for (int i = 0; i < count; i++)\n        total += va_arg(ap, int);\n    va_end(ap);\n    return total;\n}`,opts:["Retourne 3","Retourne 30","Retourne 60","Undefined behavior"],answer:2,expl:"count=3, arguments : 10, 20, 30. La boucle additionne : 10+20+30 = <strong>60</strong>. Pattern classique avec count explicite."},
+  {q:"Quel est le bug dans ce code variadique ?",code:`void print_vals(int n, ...)\n{\n    va_list ap;\n    va_start(ap, n);\n    for (int i = 0; i < n; i++)\n        printf("%d\\n", va_arg(ap, char));\n}`,opts:["Aucun bug","va_arg avec char est incorrect — les char sont promus en int","printf ne peut pas afficher des char","Il manque va_end"],answer:1,expl:"Les char sont promus en int dans les variadiques. Il faut <code>va_arg(ap, int)</code>, pas <code>va_arg(ap, char)</code>. Mauvais type = undefined behavior."},
+  {q:"Que fait va_end(ap) — est-il vraiment obligatoire ?",code:`void f(int n, ...)\n{\n    va_list ap;\n    va_start(ap, n);\n    /* ... */\n    /* va_end(ap); oublié ! */\n}`,opts:["Non, c'est optionnel","Oui — requis par le standard, certaines ABI en ont besoin","Seulement sur Windows","Seulement si count > 0"],answer:1,expl:"<code>va_end</code> est <strong>obligatoire par le standard C</strong>. Certaines ABI libèrent des ressources ou restaurent des registres. Omettre = undefined behavior portable."}
+]},
+
+"Arrays": { icon:"📦", cc:"#ff7f4f", questions:[
+  {q:"Relation entre un tableau et un pointeur en C ?",opts:["Ils sont complètement différents","Le nom du tableau est converti en pointeur vers son 1er élément dans la plupart des contextes","Un tableau est toujours un pointeur","Un pointeur est toujours un tableau"],answer:1,expl:"Dans la plupart des expressions, le nom d'un tableau <strong>décroît en pointeur</strong> vers son premier élément. Exception : <code>sizeof()</code>."},
+  {q:"Comment accède-t-on au 3ème élément d'un tableau 'arr' ?",opts:["arr[3]","arr[2]","*(arr+3)","arr.3"],answer:1,expl:"Indexé à partir de 0 → 3ème élément = <code>arr[2]</code>, équivalent à <code>*(arr+2)</code>."},
+  {q:"Que se passe-t-il avec arr[10] sur un tableau de 10 éléments ?",opts:["Erreur de compilation","Retourne 0","Undefined behavior — accès hors limites","L'OS arrête le programme"],answer:2,expl:"Accès hors limites = <strong>undefined behavior</strong>. Le compilateur C ne vérifie pas les bornes à runtime."},
+  {q:"Comment passe-t-on un tableau à une fonction en C ?",opts:["Par copie complète","Par adresse — pointeur vers le 1er élément","Par référence avec &","C ne permet pas de passer des tableaux"],answer:1,expl:"Tableaux toujours passés <strong>par adresse</strong>. La taille doit être passée séparément."},
+  {q:"Que retourne sizeof(arr) pour 'int arr[10]' ?",opts:["10","4","40","8"],answer:2,expl:"sizeof(arr) = 10 × sizeof(int) = 10 × 4 = <strong>40 octets</strong>."},
+  {q:"Comment déclare-t-on un tableau 2D de 3 lignes et 4 colonnes ?",opts:["int arr[4][3]","int arr[3][4]","int arr[3,4]","int[3][4] arr"],answer:1,expl:"<code>int arr[3][4]</code> → 3 lignes, 4 colonnes. En mémoire, stocké ligne par ligne (row-major)."},
+  {q:"Différence entre 'int arr[]' et 'int *arr' en paramètre de fonction ?",opts:["Ils sont complètement différents","Aucune — les deux deviennent un pointeur vers int","arr[] indique que c'est un tableau","arr[] passe par copie"],answer:1,expl:"En paramètre de fonction, <code>int arr[]</code> et <code>int *arr</code> sont <strong>strictement équivalents</strong>."},
+  {q:"Comment initialise-t-on tous les éléments d'un tableau à 0 ?",opts:["int arr[5] = {0,0,0,0,0}","int arr[5] = {0}","int arr[5] = {}","Les réponses A et B sont correctes"],answer:3,expl:"<code>int arr[5] = {0}</code> initialise le premier à 0 et le reste <strong>implicitement à 0</strong>. Comportement garanti par le standard."},
+  {q:"Peut-on modifier la taille d'un tableau statique après déclaration ?",opts:["Oui avec realloc()","Non — la taille est fixée à la compilation","Oui avec resize()","Oui en modifiant sizeof()"],answer:1,expl:"Un tableau statique a une taille <strong>fixée à la compilation</strong>. Pour redimensionner, utiliser malloc() + realloc()."},
+  {q:"Comment copie-t-on un tableau en C ?",opts:["arr2 = arr1 directement","Avec memcpy() ou une boucle élément par élément","Avec strcpy()","Avec arraycopy()"],answer:1,expl:"<code>arr2 = arr1</code> est invalide pour des tableaux. Il faut <code>memcpy(arr2, arr1, sizeof(arr1))</code> ou une boucle."},
+  {q:"Que fait ce code ?",code:`int arr[] = {1, 2, 3, 4, 5};\nprintf("%d\\n", arr[5]);`,opts:["Affiche 5","Affiche 0","Undefined behavior — hors limites","Erreur de compilation"],answer:2,expl:"arr a 5 éléments (index 0–4). arr[5] est <strong>hors limites</strong> → undefined behavior. Peut afficher n'importe quoi ou crasher."},
+  {q:"Que retourne sizeof dans ce code ?",code:`int arr[10];\nprintf("%zu\\n", sizeof(arr));`,opts:["10","4","40","8"],answer:2,expl:"sizeof(arr) retourne la taille totale : 10 × sizeof(int) = <strong>40 octets</strong>."},
+  {q:"Que fait ce code ?",code:`int arr[] = {10, 20, 30};\nint *p = arr;\np++;\nprintf("%d\\n", *p);`,opts:["10","20","30","Undefined behavior"],answer:1,expl:"<code>p = arr</code> → arr[0]. <code>p++</code> → arr[1]. <code>*p</code> = <strong>20</strong>."},
+  {q:"Quel est le bug dans ce code ?",code:`void fill(int *arr, int n)\n{\n    for (int i = 0; i <= n; i++)\n        arr[i] = i;\n}`,opts:["Aucun bug","La boucle va jusqu'à i==n — accès hors limites","Le tableau n'est pas initialisé","n devrait être size_t"],answer:1,expl:"<code>i <= n</code> au lieu de <code>i < n</code> → arr[n] est <strong>hors limites</strong>. Bug classique off-by-one."}
+]},
+
+"Structures & Typedef": { icon:"🏗️", cc:"#4fbfff", questions:[
+  {q:"Comment accède-t-on à un membre via un pointeur de struct ?",opts:["ptr.member","ptr::member","ptr->member","*ptr.member"],answer:2,expl:"<code>ptr->member</code> = sucre syntaxique pour <code>(*ptr).member</code>."},
+  {q:"À quoi sert typedef en C ?",opts:["Créer un nouveau type","Créer un alias pour un type existant","Définir une constante","Importer un header"],answer:1,expl:"<code>typedef</code> crée un <strong>alias</strong>. <code>typedef struct Node Node</code> → <code>Node *p</code> au lieu de <code>struct Node *p</code>."},
+  {q:"Peut-on avoir une struct avec un pointeur vers elle-même ?",opts:["Non, interdit","Oui — c'est la base des listes chaînées","Oui, mais seulement avec typedef","Non, récursion infinie"],answer:1,expl:"Oui : <code>struct Node { int val; struct Node *next; };</code>. Un <strong>pointeur</strong> vers soi-même est valide."},
+  {q:"Combien d'octets fait struct { char c; int n; } typiquement ?",opts:["5 octets","8 octets — padding d'alignement","4 octets","1 octet"],answer:1,expl:"Padding : 3 octets après char pour aligner l'int → 1 + 3(pad) + 4 = <strong>8 octets</strong>."},
+  {q:"Comment initialise-t-on une struct à la déclaration ?",opts:["En appelant une fonction init()","Avec un initializer : Point p = {10, 20};","Ce n'est pas possible en C","Uniquement avec memset()"],answer:1,expl:"<code>Point p = {10, 20};</code> initialise les membres dans l'ordre. En C99+ : <code>Point p = {.x = 10, .y = 20};</code>."},
+  {q:"Que fait memset(&s, 0, sizeof(s)) sur une struct 's' ?",opts:["Libère la mémoire","Met tous les octets à 0","Copie la struct","Initialise les pointeurs à NULL"],answer:1,expl:"<code>memset</code> met tous les <strong>octets</strong> à zéro. Entiers = 0, pointeurs = NULL sur la plupart des architectures."},
+  {q:"Peut-on assigner une struct à une autre avec '=' ?",opts:["Non — il faut memcpy()","Oui — copie membre à membre","Oui, mais seulement si même typedef","Non — le compilateur l'interdit"],answer:1,expl:"<code>s2 = s1</code> effectue une <strong>copie membre à membre</strong>. Attention : copie superficielle si la struct contient des pointeurs."},
+  {q:"Qu'est-ce que le 'padding' dans une struct ?",opts:["Des octets de données ajoutés par le programmeur","Des octets ajoutés par le compilateur pour aligner les membres en mémoire","Un type de typedef spécial","Un membre caché"],answer:1,expl:"Le compilateur insère des <strong>octets de padding</strong> pour aligner les membres sur leurs frontières naturelles."},
+  {q:"Différence entre 'struct' et 'union' en C ?",opts:["Aucune","Une struct alloue de l'espace pour tous ses membres ; une union partage le même espace","Une union peut avoir plus de membres","Une struct est toujours plus petite"],answer:1,expl:"<strong>struct</strong> : espace pour <em>tous</em> les membres. <strong>union</strong> : espace du <em>plus grand</em> membre — un seul actif à la fois."},
+  {q:"Peut-on retourner une struct par valeur depuis une fonction ?",opts:["Non — il faut retourner un pointeur","Oui — copie complète","Oui, mais seulement avec typedef","Oui, mais seulement en C99+"],answer:1,expl:"Oui, en C on peut retourner une struct par valeur. La struct entière est copiée."},
+  {q:"Comment déclare-t-on une struct anonyme avec typedef ?",opts:["struct { int x; } Point;","typedef struct { int x; int y; } Point;","typedef Point struct { int x; int y; };","struct Point typedef { int x; int y; };"],answer:1,expl:"<code>typedef struct { int x; int y; } Point;</code> — on peut ensuite écrire <code>Point p;</code> directement."},
+  {q:"Que fait ce code ?",code:`typedef struct {\n    int x;\n    int y;\n} Point;\n\nPoint p = {3, 7};\nPoint *ptr = &p;\nprintf("%d\\n", ptr->y);`,opts:["Affiche 3","Affiche 7","Segfault","Erreur de compilation"],answer:1,expl:"<code>ptr->y</code> accède au membre y de p via le pointeur = <strong>7</strong>."},
+  {q:"Que fait ce code avec une struct auto-référentielle ?",code:`typedef struct Node {\n    int val;\n    struct Node *next;\n} Node;\n\nNode a = {1, NULL};\nNode b = {2, &a};\nprintf("%d\\n", b.next->val);`,opts:["2","1","NULL","Segfault"],answer:1,expl:"<code>b.next</code> pointe vers <code>a</code>. <code>b.next->val</code> = <code>a.val</code> = <strong>1</strong>. Structure d'une liste chaînée."},
+  {q:"Quel est le problème dans ce code ?",code:`Point *make_point(int x, int y)\n{\n    Point p;\n    p.x = x; p.y = y;\n    return &p;\n}`,opts:["Aucun problème","Retourne un pointeur vers une variable locale — dangling pointer","Point ne peut pas être retourné","Il faut utiliser malloc"],answer:1,expl:"<code>p</code> est sur la stack. Quand la fonction retourne, p est détruite. Retourner <code>&p</code> = <strong>dangling pointer</strong>. Solution : retourner p par valeur ou allouer avec malloc."}
+]},
+
+"Valgrind": { icon:"🔍", cc:"#ff4faa", questions:[
+  {q:"À quoi sert principalement Valgrind ?",opts:["Compiler du code C","Détecter les erreurs mémoire (leaks, accès invalides, mémoire non initialisée)","Déboguer ligne par ligne","Optimiser les performances"],answer:1,expl:"<strong>Valgrind</strong> (memcheck) détecte : fuites mémoire, accès à mémoire libérée, accès hors limites, mémoire non initialisée."},
+  {q:"Quelle commande lance Valgrind avec détection complète des fuites ?",opts:["valgrind mon_prog","./mon_prog --valgrind","valgrind --leak-check=full ./mon_prog","gcc -valgrind mon_prog.c"],answer:2,expl:"<code>valgrind --leak-check=full ./mon_prog</code>. Sans <code>--leak-check=full</code>, certaines fuites ne sont pas rapportées en détail."},
+  {q:"Que signifie 'definitely lost' dans Valgrind ?",opts:["Une variable inutilisée","Mémoire allouée dont tous les pointeurs ont été perdus — fuite certaine","Un accès hors limites","Mémoire libérée deux fois"],answer:1,expl:"<strong>Definitely lost</strong> = mémoire impossible à libérer, aucun pointeur ne pointe dessus. Fuite la plus grave."},
+  {q:"Pour avoir les numéros de ligne dans Valgrind, comment compiler ?",opts:["gcc -O2","gcc (sans flag)","gcc -g","gcc -Wall"],answer:2,expl:"<code>-g</code> génère les symboles de debug. Sans lui, Valgrind montre des adresses hexadécimales."},
+  {q:"Que signifie 'Invalid read of size 4' ?",opts:["Un entier a été lu correctement","Lecture de 4 octets à une adresse invalide","Une optimisation du compilateur","Un problème réseau"],answer:1,expl:"<strong>Invalid read of size 4</strong> = lecture de 4 octets (int) à une adresse invalide. Cause typique : accès hors tableau, déréférencement après free()."},
+  {q:"Que signifie 'indirectly lost' ?",opts:["Fuite moins grave que definitely lost","Mémoire perdue à cause d'un autre pointeur perdu — perte en cascade","Mémoire accessible via un registre","Un bug Valgrind"],answer:1,expl:"<strong>Indirectly lost</strong> = mémoire perdue en cascade à cause d'une autre fuite. Ex : nœuds d'une liste dont la racine est perdue."},
+  {q:"Quel flag affiche d'où vient la mémoire non initialisée ?",opts:["--stack-trace=yes","--verbose","--track-origins=yes","--error-exitcode=1"],answer:2,expl:"<code>--track-origins=yes</code> dit à Valgrind de traquer l'<strong>origine</strong> de la mémoire non initialisée. Très utile pour trouver quelle variable n'a pas été initialisée."},
+  {q:"Comment Valgrind détecte-t-il les accès à de la mémoire libérée ?",opts:["Il intercepte les appels free() et marque la zone","Il vérifie chaque pointeur dans les registres","Il utilise le MMU de l'OS","Il analyse le code source"],answer:0,expl:"Valgrind intercepte <code>malloc()</code> et <code>free()</code> et maintient une map des zones allouées/libérées. Tout accès à une zone libérée est détecté."},
+  {q:"Valgrind ralentit l'exécution d'un facteur approximatif de ?",opts:["x2","x10–x50","x1000","x5000"],answer:1,expl:"Valgrind ralentit d'un facteur <strong>10 à 50×</strong>. Il instrumente chaque accès mémoire. À utiliser uniquement pendant le debug."},
+  {q:"Quel problème Valgrind détecte-t-il dans ce code ?",code:`int *p = malloc(sizeof(int));\n*p = 42;\n/* free(p) oublié */`,opts:["Aucun problème","Memory leak — 4 octets definitely lost","Accès invalide","Double free"],answer:1,expl:"Sans <code>free(p)</code> → Valgrind rapporte <strong>\"4 bytes in 1 blocks are definitely lost\"</strong>. C'est un memory leak."},
+  {q:"Quelle erreur Valgrind détecte dans ce code ?",code:`int arr[5];\narr[5] = 99;`,opts:["Aucune — arr[5] est valide","Invalid write of size 4","Memory leak","Stack overflow"],answer:1,expl:"arr[5] est hors limites. Valgrind rapporte <strong>\"Invalid write of size 4\"</strong> — écriture de 4 octets à une adresse invalide."},
+  {q:"Que rapporte Valgrind sur ce code ?",code:`int *p = malloc(sizeof(int));\nfree(p);\nfree(p);`,opts:["Aucune erreur","Invalid free() — double free détecté","Memory leak","Accès invalide en lecture"],answer:1,expl:"Valgrind détecte le <strong>double free</strong> et rapporte <code>Invalid free() / delete / delete[] / realloc()</code>."},
+  {q:"Pourquoi Valgrind ne donne pas les lignes si compilé sans -g ?",code:`$ gcc prog.c -o prog\n$ valgrind ./prog\n==1234== at 0x401156: ???`,opts:["Valgrind ne fonctionne pas sans -g","Sans -g, les symboles de debug sont absents — Valgrind voit des adresses hex","Valgrind ne supporte que C++","Il faut aussi -O0"],answer:1,expl:"Sans <code>-g</code>, pas d'informations de debug dans le binaire. Valgrind détecte les erreurs mais affiche des adresses hexadécimales. Toujours compiler avec <code>gcc -g</code>."}
+]},
+
+"GDB": { icon:"🐛", cc:"#ffdd4f", questions:[
+  {q:"Comment lancer GDB sur './mon_prog' ?",opts:["gdb run mon_prog","./mon_prog --debug","gdb ./mon_prog","debug mon_prog"],answer:2,expl:"<code>gdb ./mon_prog</code> lance GDB. Ensuite <code>run</code> pour démarrer. Compiler avec <code>-g</code> pour les symboles."},
+  {q:"Quelle commande GDB place un breakpoint à la ligne 42 ?",opts:["stop 42","pause line 42","break 42","b 42 — les deux (break et b) sont corrects"],answer:3,expl:"<code>break 42</code> et <code>b 42</code> sont équivalents. <code>break main</code> = début de main."},
+  {q:"Quelle commande GDB affiche la valeur de 'x' ?",opts:["show x","log x","print x","watch x"],answer:2,expl:"<code>print x</code> (alias <code>p x</code>) affiche la valeur de x. <code>watch x</code> arrête quand x change."},
+  {q:"Différence entre 'next' et 'step' dans GDB ?",opts:["Aucune","next = ligne suivante sans entrer dans les fonctions ; step = entre dans les fonctions","step = ligne suivante, next = entre","next est plus rapide"],answer:1,expl:"<code>next</code> (n) : ligne suivante sans descendre. <code>step</code> (s) : entre dans la fonction appelée."},
+  {q:"Comment voir la pile d'appels dans GDB ?",opts:["stack","callstack","backtrace (ou bt)","frames"],answer:2,expl:"<code>backtrace</code> (alias <code>bt</code>) affiche la pile d'appels complète. <code>frame N</code> pour naviguer."},
+  {q:"Comment continuer jusqu'au prochain breakpoint ?",opts:["next","run","continue (ou c)","resume"],answer:2,expl:"<code>continue</code> (alias <code>c</code>) reprend l'exécution jusqu'au prochain breakpoint."},
+  {q:"Comment afficher toutes les variables locales dans GDB ?",opts:["print all","show locals","info locals","list vars"],answer:2,expl:"<code>info locals</code> affiche toutes les variables locales du frame courant."},
+  {q:"Comment définir un watchpoint sur 'x' dans GDB ?",opts:["break x","trace x","watch x","monitor x"],answer:2,expl:"<code>watch x</code> crée un <strong>watchpoint</strong> — GDB s'arrête quand la valeur de x change."},
+  {q:"Que fait la commande 'finish' dans GDB ?",opts:["Termine GDB","Exécute jusqu'à la fin de la fonction courante puis s'arrête","Supprime tous les breakpoints","Redémarre le programme"],answer:1,expl:"<code>finish</code> exécute le reste de la fonction courante et s'arrête à son retour."},
+  {q:"Comment lancer GDB et passer des arguments ?",opts:["gdb ./prog --arg1","gdb ./prog puis 'run arg1 arg2'","gdb --args ./prog arg1 arg2 — les deux dernières sont correctes","gdb ./prog -a arg1"],answer:2,expl:"<code>gdb --args ./prog arg1 arg2</code> ou <code>gdb ./prog</code> puis <code>run arg1 arg2</code>. Les deux fonctionnent."},
+  {q:"Dans GDB, quelle commande utiliser après ce crash ?",code:`Program received signal SIGSEGV,\nSegmentation fault.\n0x0000000000401156 in main ()`,opts:["run","quit","backtrace","info registers"],answer:2,expl:"Après un crash, <strong>backtrace</strong> (bt) affiche la pile d'appels complète — qui a appelé qui jusqu'au point du crash. Premier réflexe après un segfault."},
+  {q:"Quelle commande GDB affiche la valeur de 'ptr->val' ?",code:`(gdb) /* ptr est un Node* */`,opts:["show ptr->val","print ptr->val","watch ptr->val","info ptr"],answer:1,expl:"<code>print ptr->val</code> évalue et affiche l'expression — GDB gère l'arithmétique de pointeurs et les accès aux membres de structs."},
+  {q:"Que fait cette séquence de commandes GDB ?",code:`(gdb) break main\n(gdb) run\n(gdb) next\n(gdb) next\n(gdb) print x`,opts:["Affiche x avant main","Lance le programme, passe 2 lignes, affiche x","Crée 2 breakpoints","Recompile le programme"],answer:1,expl:"BP sur main, run s'arrête là, deux next avancent de 2 lignes, print x affiche x à ce point précis."},
+  {q:"Comment afficher un tableau 'arr' de 5 ints dans GDB ?",code:`(gdb) /* arr est un int[5] */`,opts:["print arr","print arr[0..4]","print *arr@5","Les réponses A et C sont correctes"],answer:3,expl:"<code>print arr</code> pour un tableau statique. <code>print *arr@5</code> pour un pointeur : la syntaxe <code>*ptr@n</code> affiche n éléments depuis ptr."}
+]},
+
+"Strings": { icon:"📝", cc:"#4fff9f", questions:[
+  {q:"Comment les chaînes sont-elles terminées en C ?",opts:["Par un espace","Par '\\0' (null terminator)","Par un retour à la ligne","Elles ont une longueur stockée"],answer:1,expl:"Chaîne C = tableau de <code>char</code> terminé par <code>'\\0'</code> (ASCII 0)."},
+  {q:"Que retourne strlen(\"hello\") ?",opts:["6","5","4","Dépend du système"],answer:1,expl:"<code>strlen()</code> retourne le nombre de chars <strong>sans le '\\0'</strong>. \"hello\" = 5 chars + '\\0' → strlen = 5."},
+  {q:"Différence entre strcpy() et strncpy() ?",opts:["Aucune","strcpy() copie jusqu'au '\\0', strncpy() copie max n chars","strncpy() est plus rapide","strcpy() ne marche qu'avec des constantes"],answer:1,expl:"<code>strcpy(dst, src)</code> copie jusqu'au '\\0' sans vérifier la taille → buffer overflow possible. <code>strncpy(dst, src, n)</code> copie max n chars."},
+  {q:"Que retourne strcmp(\"abc\", \"abc\") ?",opts:["1","true","-1","0"],answer:3,expl:"<code>strcmp()</code> retourne <strong>0</strong> si les chaînes sont égales. Ne jamais comparer des chaînes avec ==."},
+  {q:"Comment concatène-t-on deux chaînes en C ?",opts:["str1 + str2","strcat(dst, src)","strcopy(dst, src)","merge(str1, str2)"],answer:1,expl:"<code>strcat(dst, src)</code> ajoute src à la fin de dst. <code>strncat(dst, src, n)</code> est plus sûr."},
+  {q:"Qu'est-ce qu'un buffer overflow dans le contexte des chaînes ?",opts:["Une chaîne trop courte","Écriture au-delà de la limite du buffer alloué","Un printf qui affiche trop","Une chaîne sans '\\0'"],answer:1,expl:"<strong>Buffer overflow</strong> = écriture au-delà du buffer. Cause classique : <code>strcpy(buf, input)</code> sans vérifier la taille."},
+  {q:"Comment cherche-t-on un caractère dans une chaîne ?",opts:["search(str, 'c')","strfind(str, 'c')","strchr(str, 'c')","charof(str, 'c')"],answer:2,expl:"<code>strchr(str, c)</code> retourne un pointeur vers la première occurrence de c, ou NULL si non trouvé."},
+  {q:"Que fait sprintf() ?",opts:["Affiche dans le terminal","Écrit une chaîne formatée dans un buffer","Lit une chaîne depuis stdin","Copie une chaîne"],answer:1,expl:"<code>sprintf(buffer, format, ...)</code> écrit dans un buffer char[]. Utiliser <code>snprintf()</code> en production pour éviter les overflows."},
+  {q:"Comment convertit-on une chaîne en entier en C ?",opts:["(int)str","int(str)","atoi(str)","intof(str)"],answer:2,expl:"<code>atoi(str)</code> convertit une chaîne en int. Plus robuste : <code>strtol(str, NULL, 10)</code>."},
+  {q:"Taille minimale d'un buffer pour stocker \"Holberton\" ?",opts:["8 octets","9 octets","10 octets","11 octets"],answer:2,expl:"\"Holberton\" = 9 chars + '\\0' = <strong>10 octets minimum</strong>."},
+  {q:"Que fait ce code ?",code:`char str[] = "hello";\nstr[0] = 'H';\nprintf("%s\\n", str);`,opts:["Segfault — strings immuables","Affiche hello","Affiche Hello","Erreur de compilation"],answer:2,expl:"<code>char str[]</code> est un tableau modifiable sur la stack. <code>str[0] = 'H'</code> → affiche <strong>Hello</strong>. Différent de <code>char *str = \"hello\"</code> qui est en lecture seule."},
+  {q:"Quel est le bug dans ce code ?",code:`char buf[5];\nstrcpy(buf, "Holberton");`,opts:["Aucun bug","Buffer overflow — 'Holberton' fait 10 octets, buf n'a que 5","strcpy n'accepte pas les littéraux","buf doit être initialisé à 0"],answer:1,expl:"\"Holberton\" = 10 octets. buf = 5 octets → <strong>buffer overflow</strong>. Les 5 octets suivants sont écrasés."},
+  {q:"Que retourne strcmp dans ce code ?",code:`int r = strcmp("abc", "abd");`,opts:["0","Une valeur négative — 'abc' est avant 'abd'","Une valeur positive","1 exactement"],answer:1,expl:"'c'(99) < 'd'(100) → strcmp retourne une valeur <strong>négative</strong>. La première chaîne est lexicographiquement avant la seconde."},
+  {q:"Quel est le bug dans ce code ?",code:`char *s1 = "hello";\nchar *s2 = "hello";\nif (s1 == s2)\n    printf("egales\\n");`,opts:["Aucun bug","Compare les adresses pas les valeurs — utiliser strcmp()","Les pointeurs const ne peuvent pas être comparés","printf est incorrect"],answer:1,expl:"<code>s1 == s2</code> compare les <strong>adresses</strong>, pas le contenu. Pour comparer des chaînes : toujours <code>strcmp(s1, s2) == 0</code>."}
+]}
+
+};
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let sel=new Set(), pool=[], cur=0, score=0, answered=false, recap=[], isRevisionMode=false;
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+function init(){
+  const g=document.getElementById('subcat-grid'); g.innerHTML='';
+  Object.entries(SUBCATS).forEach(([name,d])=>{
+    const c=document.createElement('div');
+    c.className='subcat-card'; c.style.setProperty('--cc',d.cc); c.dataset.cat=name;
+    c.innerHTML=`
+      <div class="subcat-top">
+        <div class="subcat-icon">${d.icon}</div>
+        <div class="subcat-tick">✓</div>
+      </div>
+      <div class="subcat-name">${name}</div>
+      <div class="subcat-count">${d.questions.length} question${d.questions.length>1?'s':''}</div>`;
+    c.onclick=()=>toggle(name,c);
+    g.appendChild(c);
+  });
+}
+
+function toggle(name,card){
+  sel.has(name)?(sel.delete(name),card.classList.remove('selected')):(sel.add(name),card.classList.add('selected'));
+  updateUI();
+}
+
+function selectAll(){
+  const all=Object.keys(SUBCATS), allSel=sel.size===all.length;
+  if(allSel){sel.clear();document.querySelectorAll('.subcat-card').forEach(c=>c.classList.remove('selected'));}
+  else{all.forEach(n=>sel.add(n));document.querySelectorAll('.subcat-card').forEach(c=>c.classList.add('selected'));}
+  document.getElementById('btn-all').textContent=!allSel?'Tout désélectionner':'Tout sélectionner';
+  updateUI();
+}
+
+function updateUI(){
+  const n=sel.size, total=[...sel].reduce((a,k)=>a+SUBCATS[k].questions.length,0);
+  document.getElementById('c-meta').innerHTML=n===0?'Sélectionne des thèmes ci-dessous':`<strong>${n}</strong> thème${n>1?'s':''} · <strong>${total}</strong> question${total>1?'s':''}`;
+  document.getElementById('btn-start').disabled=n===0;
+  document.getElementById('start-hint').innerHTML=n===0?'Sélectionne au moins un thème pour commencer':`<strong>${total}</strong> question${total>1?'s':''} dans <strong>${n}</strong> thème${n>1?'s':''}`;
+}
+
+/* ══════════════════════════════════════════
+   QUIZ
+══════════════════════════════════════════ */
+function startQuiz(){
+  pool=[];
+  sel.forEach(cat=>SUBCATS[cat].questions.forEach(q=>pool.push({...q,cat})));
+  pool.sort(()=>Math.random()-0.5);
+  cur=0; score=0; recap=[]; answered=false;
+  show('quiz'); renderQ();
+}
+
+function renderQ(){
+  const q=pool[cur], tot=pool.length;
+  document.getElementById('pfill').style.width=`${(cur/tot)*100}%`;
+  document.getElementById('qnum').textContent=`${cur+1} / ${tot}`;
+  document.getElementById('qbadge').textContent=q.cat;
+  document.getElementById('expl').style.display='none';
+  document.getElementById('btn-next').style.display='none';
+  answered=false;
+
+  const qtext=document.getElementById('qtext');
+  let html=`<span>${q.q}</span>`;
+  if(q.code){
+    html+=`<div class="code-label">Que fait ce code ?</div><div class="code-block">${highlight(q.code)}</div>`;
+  }
+  qtext.innerHTML=html;
+
+  const list=document.getElementById('opts'); list.innerHTML='';
+  ['A','B','C','D'].slice(0,q.opts.length).forEach((k,i)=>{
+    const b=document.createElement('button'); b.className='opt-btn';
+    b.innerHTML=`<span class="opt-key">${k}</span><span class="opt-text">${q.opts[i]}</span>`;
+    b.onclick=()=>pick(i); list.appendChild(b);
+  });
+}
+
+function pick(idx){
+  if(answered)return; answered=true;
+  const q=pool[cur];
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===q.answer) b.classList.add('correct');
+    else if(i===idx) b.classList.add('wrong');
+  });
+  if(idx===q.answer) score++;
+  recap.push({q:q.q, cat:q.cat, ok:idx===q.answer, ans:q.opts[q.answer]});
+  const expl=document.getElementById('expl'); expl.innerHTML=q.expl; expl.style.display='block';
+  const bn=document.getElementById('btn-next'); bn.style.display='inline-flex';
+  bn.innerHTML=cur<pool.length-1?'Continuer <span>→</span>':'Voir les résultats <span>→</span>';
+  const hud=document.getElementById('score-hud');
+  hud.textContent=`${score} / ${recap.length}`; hud.classList.add('active');
+}
+
+function nextQ(){ cur++; cur>=pool.length?showResults():renderQ(); }
+
+/* ══════════════════════════════════════════
+   RESULTS
+══════════════════════════════════════════ */
+function showResults(){
+  const tot=pool.length, pct=Math.round((score/tot)*100);
+  const errors=recap.filter(r=>!r.ok);
+  document.getElementById('rscore').textContent=score;
+  document.getElementById('rdenom').textContent=`/ ${tot}`;
+  const circ=2*Math.PI*72;
+  document.getElementById('rfill').style.strokeDashoffset=circ;
+  setTimeout(()=>{document.getElementById('rfill').style.strokeDashoffset=circ-(pct/100)*circ;},120);
+  let title,sub;
+  if(pct===100){title='PARFAIT. 🏆';sub='100% — aucune erreur. Impressionnant.';}
+  else if(pct>=80){title='SOLIDE. 🔥';sub=`${pct}% — les bases sont là.`;}
+  else if(pct>=50){title='PAS MAL.';sub=`${pct}% — quelques lacunes à combler.`;}
+  else{title='À RETRAVAILLER.';sub=`${pct}% — retourne sur le cours.`;}
+  document.getElementById('rtitle').textContent=title;
+  document.getElementById('rsub').textContent=sub;
+  document.getElementById('revision-badge').style.display=isRevisionMode?'inline-flex':'none';
+  const retryBtn=document.getElementById('btn-retry');
+  retryBtn.disabled=errors.length===0;
+  retryBtn.innerHTML=errors.length===0?'✓ Aucune erreur !':
+    `↺ Refaire mes ${errors.length} erreur${errors.length>1?'s':''}`;
+  const rc=document.getElementById('recap'); rc.innerHTML='';
+  recap.forEach(r=>{
+    const d=document.createElement('div'); d.className='recap-item';
+    d.innerHTML=`<div class="recap-dot ${r.ok?'ok':'ko'}"></div><div>
+      <div class="recap-cat">${r.cat}</div>
+      <div class="recap-q">${r.q}</div>
+      ${!r.ok?`<div class="recap-a">→ ${r.ans}</div>`:''}</div>`;
+    rc.appendChild(d);
+  });
+  show('results');
+  document.getElementById('pfill').style.width='100%';
+  document.getElementById('score-hud').textContent=`${score} / ${tot}`;
+}
+
+function retryErrors(){
+  const errors=recap.filter(r=>!r.ok).map(r=>pool.find(q=>q.q===r.q)).filter(Boolean);
+  if(!errors.length)return;
+  pool=[...errors].sort(()=>Math.random()-0.5);
+  cur=0; score=0; recap=[]; answered=false; isRevisionMode=true;
+  document.getElementById('rfill').style.strokeDashoffset=2*Math.PI*72;
+  show('quiz'); renderQ();
+}
+
+function goHome(){
+  sel.clear();
+  document.querySelectorAll('.subcat-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('btn-all').textContent='Tout sélectionner';
+  updateUI();
+  const hud=document.getElementById('score-hud'); hud.textContent='——'; hud.classList.remove('active');
+  isRevisionMode=false;
+  document.getElementById('rfill').style.strokeDashoffset=2*Math.PI*72;
+  show('home');
+}
+
+function show(s){
+  ['home','quiz','results'].forEach(id=>
+    document.getElementById(`screen-${id}`).style.display=id===s?'block':'none');
+}
+
+/* ══════════════════════════════════════════
+   THEME
+══════════════════════════════════════════ */
+function toggleTheme(){
+  const dark=document.body.classList.toggle('dark');
+  document.getElementById('toggle-icon').textContent=dark?'🌙':'☀️';
+  localStorage.setItem('theme',dark?'dark':'light');
+}
+(function(){
+  if(localStorage.getItem('theme')==='dark'){
+    document.body.classList.add('dark');
+    document.getElementById('toggle-icon').textContent='🌙';
+  }
+})();
+
+init();
+</script>
+</body>
+</html>
